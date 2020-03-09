@@ -1,8 +1,10 @@
+no-parallel: true
+
 jobs:
 
 - name: power
   set:
-    val: 12345
+    val: 1234
 
 - name: Validator
   update-account:
@@ -28,6 +30,10 @@ jobs:
     key: $CheckAdded
     relation: eq
     val: $power
+
+#- name: deployStorageK
+#  deploy:
+#    contract: storage.sol
 
 - name: UnbondValidator
   unbond:
