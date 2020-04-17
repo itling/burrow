@@ -10,13 +10,15 @@ import (
 	"github.com/hyperledger/burrow/event/query"
 	"github.com/hyperledger/burrow/execution/exec"
 	"github.com/hyperledger/burrow/logging"
+	"github.com/hyperledger/burrow/storage"
 )
 
 const SubscribeBufferSize = 100
 
 type Provider interface {
 	// Get transactions
-	IterateStreamEvents(start, end *uint64, consumer func(*exec.StreamEvent) error) (err error)
+	IterateStreamEvents(startHeight, endHeight *uint64, sortOrder storage.SortOrder,
+		consumer func(*exec.StreamEvent) error) (err error)
 	// Get a particular TxExecution by hash
 	TxByHash(txHash []byte) (*exec.TxExecution, error)
 }
@@ -202,7 +204,7 @@ func (ees *executionEventsServer) iterateStreamEvents(startHeight, endHeight uin
 	// NOTE: this will underflow when start is 0 (as it often will be - and needs to be for restored chains)
 	// however we at most underflow by 1 and we always add 1 back on when returning so we get away with this.
 	lastHeightSeen := startHeight - 1
-	err := ees.eventsProvider.IterateStreamEvents(&startHeight, &endHeight,
+	err := ees.eventsProvider.IterateStreamEvents(&startHeight, &endHeight, storage.AscendingSort,
 		func(blockEvent *exec.StreamEvent) error {
 			if blockEvent.EndBlock != nil {
 				lastHeightSeen = blockEvent.EndBlock.GetHeight()
