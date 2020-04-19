@@ -45,7 +45,7 @@ type EthService struct {
 	nodeView   *tendermint.NodeView
 	trans      *execution.Transactor
 	keyClient  keys.KeyClient
-	keyStore   *keys.KeyStore
+	keyStore   *keys.FilesystemKeyStore
 	config     *tmConfig.Config
 	logger     *logging.Logger
 }
@@ -54,7 +54,7 @@ type EthService struct {
 func NewEthService(accounts acmstate.IterableStatsReader,
 	events EventsReader, blockchain bcm.BlockchainInfo,
 	validators validator.History, nodeView *tendermint.NodeView,
-	trans *execution.Transactor, keyStore *keys.KeyStore,
+	trans *execution.Transactor, keyStore *keys.FilesystemKeyStore,
 	logger *logging.Logger) *EthService {
 
 	keyClient := keys.NewLocalKeyClient(keyStore, logger)

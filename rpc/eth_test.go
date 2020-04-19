@@ -38,7 +38,7 @@ func TestWeb3Service(t *testing.T) {
 	require.NoError(t, err)
 	defer os.RemoveAll(dir)
 
-	store := keys.NewKeyStore(dir, true)
+	store := keys.NewFilesystemKeyStore(dir, true)
 	for _, acc := range genesisAccounts {
 		err = store.StoreKeyPlain(&keys.Key{
 			CurveType:  acc.PrivateKey().CurveType,
@@ -175,12 +175,21 @@ func TestWeb3Service(t *testing.T) {
 		})
 
 		t.Run("EthGetTransactionReceipt", func(t *testing.T) {
+			sendResult, err := eth.EthSendTransaction(&web3.EthSendTransactionParams{
+				Transaction: web3.Transaction{
+					From: x.EncodeBytes(genesisAccounts[3].GetAddress().Bytes()),
+					Gas:  x.EncodeNumber(40),
+					Data: x.EncodeBytes(rpc.Bytecode_HelloWorld),
+				},
+			})
+			require.NoError(t, err)
+			txHash = sendResult.TransactionHash
 			require.NotEmpty(t, txHash, "need tx hash to get tx receipt")
-			result, err := eth.EthGetTransactionReceipt(&web3.EthGetTransactionReceiptParams{
+			receiptResult, err := eth.EthGetTransactionReceipt(&web3.EthGetTransactionReceiptParams{
 				TransactionHash: txHash,
 			})
 			require.NoError(t, err)
-			contractAddress = result.Receipt.ContractAddress
+			contractAddress = receiptResult.Receipt.ContractAddress
 			require.NotEmpty(t, contractAddress)
 		})
 

@@ -21,7 +21,6 @@ import (
 	"github.com/hyperledger/burrow/integration"
 	"github.com/hyperledger/burrow/integration/rpctest"
 	"github.com/hyperledger/burrow/keys"
-	"github.com/hyperledger/burrow/keys/mock"
 	"github.com/hyperledger/burrow/logging/logconfig"
 	"github.com/hyperledger/burrow/logging/loggers"
 	"github.com/hyperledger/burrow/rpc/rpctransact"
@@ -137,7 +136,7 @@ func bootWaitBlocksShutdown(t testing.TB, validator *acm.PrivateAccount, private
 	}
 
 	kern.SetKeyClient(mock.NewKeyClient(privateAccounts...))
-	kern.SetKeyStore(keys.NewKeyStore(keys.DefaultKeysDir, false))
+	kern.SetKeyStore(keys.NewFilesystemKeyStore(keys.DefaultKeysDir, false))
 	ctx := context.Background()
 	if err = kern.Boot(); err != nil {
 		return err
